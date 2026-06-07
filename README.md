@@ -1,21 +1,48 @@
-# shadcn/ui monorepo template
+# Infield UI
 
-This is a Vite monorepo template with shadcn/ui.
+Shadcn/ui component showcase — all 56 components rendered in a sidebar layout.
 
-## Adding components
-
-To add components to your app, run the following command at the root of your `web` app:
+## Run dev
 
 ```bash
-pnpm dlx shadcn@latest add button -c apps/web
+pnpm install
+pnpm dev
 ```
 
-This will place the ui components in the `packages/ui/src/components` directory.
+Open http://localhost:5173
 
-## Using components
+## Project structure
 
-To use the components in your app, import them from the `ui` package.
-
-```tsx
-import { Button } from "@workspace/ui/components/button";
 ```
+infield/
+├── apps/web/          # Vite + React app
+│   └── src/App.tsx    # Full component showcase
+└── packages/ui/       # shadcn/ui component library
+    └── src/components/ # 56 component files
+```
+
+## Components included
+
+All shadcn/ui components from the `new-york` preset:
+
+**Navigation:** Accordion, Breadcrumb, Collapsible, Navigation Menu, Tabs  
+**Forms:** Checkbox, DatePicker, Input, InputGroup, InputOTP, Label, NativeSelect, RadioGroup, Select, Switch, Textarea, Toggle, ToggleGroup  
+**Data Display:** Avatar, Badge, Calendar, Card, Divider, Item, Kbd, Progress, Skeleton, Spinner, Table  
+**Feedback:** Alert, AlertDialog, Toast  
+**Layout:** AspectRatio, Resizable, ScrollArea, Separator  
+**Overlays:** Dialog, Drawer, DropdownMenu, HoverCard, Menubar, Popover, Sheet, Tooltip  
+**Advanced:** Carousel, Chart, Combobox, Command, ContextMenu, Empty, Field, Form, Pagination, Sidebar, Sonner
+
+## Build
+
+```bash
+pnpm build
+```
+
+## Tech stack
+
+- React 19 + TypeScript
+- Vite 6
+- Tailwind CSS v4
+- shadcn/ui `new-york` style
+- Monorepo (pnpm + Turbo)
