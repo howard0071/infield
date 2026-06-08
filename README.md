@@ -39,6 +39,30 @@ All shadcn/ui components from the `new-york` preset:
 pnpm build
 ```
 
+## Gallery Page
+
+Photo gallery showcase section. Files involved:
+
+| File | Role |
+|------|------|
+| `apps/web/src/components/GalleryPage.tsx` | Gallery component — sidebar, grid, lightbox, filters |
+| `apps/web/src/App.tsx` | Imports and renders GalleryPage when `activeSection === "gallery"` |
+| `packages/ui/src/styles/globals.css` | Design tokens (CSS variables for colors, radius, fonts) |
+
+**UI components used** (all from `packages/ui/components/`):
+
+- `dialog` — Dialog, DialogContent, DialogOverlay (lightbox)
+- `button` — action buttons (Heart, Trash, Close)
+- `tooltip` — TooltipProvider, Tooltip, TooltipContent, TooltipTrigger
+- `popover` — searchable multi-select filter dropdown
+- `scroll-area` — sidebar scroll
+- `sidebar` — Sidebar, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuSub
+- `collapsible` — Collapsible, CollapsibleTrigger, CollapsibleContent (expandable Albums)
+
+**Icons:** `lucide-react` (Heart, Trash2, X, ChevronLeft, ChevronRight, ChevronDown, Search, Star, Calendar, LayoutGrid, Columns, List)
+
+GalleryPage is fully self-contained — no props passed from App.tsx except `className`.
+
 ## Tech stack
 
 - React 19 + TypeScript
