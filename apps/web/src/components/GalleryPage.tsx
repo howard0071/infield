@@ -13,7 +13,6 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { ScrollArea } from "@workspace/ui/components/scroll-area"
 import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover"
-import { Checkbox } from "@workspace/ui/components/checkbox"
 import { cn } from "@workspace/ui/lib/utils"
 import {
   Heart,
@@ -22,6 +21,7 @@ import {
   ChevronRight,
   X,
   Filter,
+  Search,
   ImageIcon,
   LayoutGrid,
   Columns,
@@ -41,6 +41,7 @@ type Photo = {
   date: string
   location?: string
   favorite: boolean
+  source: string
 }
 
 type Collection = {
@@ -69,6 +70,7 @@ const PHOTOS: Photo[] = [
     date: "June 12, 2025",
     location: "Rocky Mountains, CO",
     favorite: true,
+    source: "Photos",
   },
   {
     id: "2",
@@ -77,6 +79,7 @@ const PHOTOS: Photo[] = [
     date: "June 8, 2025",
     location: "Pacific Coast, CA",
     favorite: false,
+    source: "Instagram",
   },
   {
     id: "3",
@@ -85,6 +88,7 @@ const PHOTOS: Photo[] = [
     date: "May 30, 2025",
     location: "New York, NY",
     favorite: true,
+    source: "Camera Roll",
   },
   {
     id: "4",
@@ -93,6 +97,7 @@ const PHOTOS: Photo[] = [
     date: "May 22, 2025",
     location: "Redwood National Park, CA",
     favorite: false,
+    source: "Photos",
   },
   {
     id: "5",
@@ -101,6 +106,7 @@ const PHOTOS: Photo[] = [
     date: "May 15, 2025",
     location: "Mojave Desert, CA",
     favorite: false,
+    source: "Flickr",
   },
   {
     id: "6",
@@ -109,6 +115,7 @@ const PHOTOS: Photo[] = [
     date: "May 10, 2025",
     location: "Lake Tahoe, NV",
     favorite: true,
+    source: "Camera Roll",
   },
   {
     id: "7",
@@ -117,6 +124,7 @@ const PHOTOS: Photo[] = [
     date: "April 28, 2025",
     location: "Vermont",
     favorite: false,
+    source: "Photos",
   },
   {
     id: "8",
@@ -125,6 +133,7 @@ const PHOTOS: Photo[] = [
     date: "April 20, 2025",
     location: "Joshua Tree, CA",
     favorite: false,
+    source: "Instagram",
   },
   {
     id: "9",
@@ -133,6 +142,7 @@ const PHOTOS: Photo[] = [
     date: "April 12, 2025",
     location: "Iceland",
     favorite: false,
+    source: "Flickr",
   },
   {
     id: "10",
@@ -141,6 +151,7 @@ const PHOTOS: Photo[] = [
     date: "March 30, 2025",
     location: "Tokyo, Japan",
     favorite: false,
+    source: "Camera Roll",
   },
   {
     id: "11",
@@ -149,6 +160,7 @@ const PHOTOS: Photo[] = [
     date: "March 15, 2025",
     location: "Swiss Alps",
     favorite: false,
+    source: "Photos",
   },
   {
     id: "12",
@@ -157,6 +169,7 @@ const PHOTOS: Photo[] = [
     date: "March 5, 2025",
     location: "Maui, HI",
     favorite: false,
+    source: "Instagram",
   },
 ]
 
@@ -184,6 +197,7 @@ export function GalleryPage({ className }: GalleryPageProps) {
   const [photos, setPhotos] = React.useState(PHOTOS)
   const [favoritesOnly, setFavoritesOnly] = React.useState(false)
   const [selectedMonths, setSelectedMonths] = React.useState<string[]>([])
+  const [selectedSourceApps, setSelectedSourceApps] = React.useState<string[]>([])
 
   // Extract unique months from photos
   const availableMonths = React.useMemo(() => {
@@ -192,6 +206,13 @@ export function GalleryPage({ className }: GalleryPageProps) {
       const d = new Date(p.date)
       seen.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`)
     })
+    return Array.from(seen).sort().reverse()
+  }, [photos])
+
+  // Extract unique source apps
+  const availableSourceApps = React.useMemo(() => {
+    const seen = new Set<string>()
+    photos.forEach((p) => seen.add(p.source))
     return Array.from(seen).sort()
   }, [photos])
 
@@ -200,6 +221,19 @@ export function GalleryPage({ className }: GalleryPageProps) {
       prev.includes(month) ? prev.filter((m) => m !== month) : [...prev, month]
     )
   }
+
+  const toggleSourceApp = (app: string) => {
+    setSelectedSourceApps((prev) =>
+      prev.includes(app) ? prev.filter((a) => a !== app) : [...prev, app]
+    )
+  }
+
+  const clearFilters = () => {
+    setSelectedMonths([])
+    setSelectedSourceApps([])
+  }
+
+  const hasActiveFilters = selectedMonths.length > 0 || selectedSourceApps.length > 0
 
   const filteredPhotos = React.useMemo(() => {
     let list = photos
@@ -212,8 +246,11 @@ export function GalleryPage({ className }: GalleryPageProps) {
         return selectedMonths.includes(m)
       })
     }
+    if (selectedSourceApps.length > 0) {
+      list = list.filter((p) => selectedSourceApps.includes(p.source))
+    }
     return list
-  }, [photos, activeCollection, favoritesOnly, selectedMonths])
+  }, [photos, activeCollection, favoritesOnly, selectedMonths, selectedSourceApps])
 
   const colsClass = THUMB_SIZES[zoomIndex].cols
 
@@ -334,40 +371,115 @@ export function GalleryPage({ className }: GalleryPageProps) {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
-                    variant={selectedMonths.length > 0 ? "secondary" : "ghost"}
+                    variant={hasActiveFilters ? "secondary" : "ghost"}
                     size="icon-xs"
                   >
                     <Filter className="size-3" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-52 p-3" align="start">
-                  <p className="text-xs font-semibold text-foreground mb-2">Filter by month</p>
-                  <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                    {availableMonths.map((month) => {
-                      const [year, m] = month.split("-")
-                      const label = new Date(Number(year), Number(m) - 1, 1).toLocaleString("default", {
-                        month: "long",
-                        year: "numeric",
-                      })
-                      return (
-                        <label key={month} className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground">
-                          <Checkbox
-                            checked={selectedMonths.includes(month)}
-                            onCheckedChange={() => toggleMonth(month)}
-                          />
-                          {label}
-                        </label>
-                      )
-                    })}
+                <PopoverContent className="w-72 p-0" align="start">
+                  <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
+                    <Search className="size-4 text-muted-foreground shrink-0" />
+                    <input
+                      id="gallery-filter-search"
+                      type="text"
+                      placeholder="Search filters..."
+                      className="flex-1 text-sm bg-transparent outline-none placeholder:text-muted-foreground"
+                      onChange={(e) => {
+                        const q = e.target.value.toLowerCase()
+                        const items = document.querySelectorAll<HTMLElement>("[data-filter-group]")
+                        items.forEach((item) => {
+                          const label = item.dataset.filterLabel?.toLowerCase() ?? ""
+                          item.style.display = label.includes(q) ? "" : "none"
+                        })
+                      }}
+                    />
+                    {hasActiveFilters && (
+                      <button
+                        className="text-xs text-muted-foreground hover:text-foreground underline shrink-0"
+                        onClick={clearFilters}
+                      >
+                        Clear
+                      </button>
+                    )}
                   </div>
-                  {selectedMonths.length > 0 && (
-                    <button
-                      className="mt-2 text-xs text-muted-foreground hover:text-foreground underline"
-                      onClick={() => setSelectedMonths([])}
-                    >
-                      Clear filters
-                    </button>
-                  )}
+                  <div className="max-h-64 overflow-y-auto p-2">
+                    {/* Month filter */}
+                    <div data-filter-group data-filter-label="June 2025">
+                      <p className="px-1 py-1.5 text-xs font-semibold text-foreground">Month</p>
+                      {availableMonths.map((month) => {
+                        const [year, m] = month.split("-")
+                        const label = new Date(Number(year), Number(m) - 1, 1).toLocaleString("default", {
+                          month: "long",
+                          year: "numeric",
+                        })
+                        const checked = selectedMonths.includes(month)
+                        return (
+                          <label
+                            key={month}
+                            className="flex items-center gap-2.5 rounded-sm px-1.5 py-1.5 cursor-pointer hover:bg-accent text-sm text-muted-foreground hover:text-foreground"
+                          >
+                            <span
+                              className={cn(
+                                "flex items-center justify-center size-4 rounded-sm border shrink-0 transition-colors",
+                                checked
+                                  ? "bg-primary border-primary text-primary-foreground"
+                                  : "border-input"
+                              )}
+                              onClick={() => toggleMonth(month)}
+                            >
+                              {checked && (
+                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                                  <path d="M1 3.5L3.5 6L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              )}
+                            </span>
+                            <span onClick={() => toggleMonth(month)}>{label}</span>
+                            <span className="ms-auto text-xs text-muted-foreground tabular-nums">
+                              {photos.filter((p) => {
+                                const d = new Date(p.date)
+                                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}` === month
+                              }).length}
+                            </span>
+                          </label>
+                        )
+                      })}
+                    </div>
+
+                    {/* Source app filter */}
+                    <div className="mt-1" data-filter-group data-filter-label={availableSourceApps.join(" ")}>
+                      <p className="px-1 py-1.5 text-xs font-semibold text-foreground">Source app</p>
+                      {availableSourceApps.map((app) => {
+                        const checked = selectedSourceApps.includes(app)
+                        return (
+                          <label
+                            key={app}
+                            className="flex items-center gap-2.5 rounded-sm px-1.5 py-1.5 cursor-pointer hover:bg-accent text-sm text-muted-foreground hover:text-foreground"
+                          >
+                            <span
+                              className={cn(
+                                "flex items-center justify-center size-4 rounded-sm border shrink-0 transition-colors",
+                                checked
+                                  ? "bg-primary border-primary text-primary-foreground"
+                                  : "border-input"
+                              )}
+                              onClick={() => toggleSourceApp(app)}
+                            >
+                              {checked && (
+                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                                  <path d="M1 3.5L3.5 6L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              )}
+                            </span>
+                            <span onClick={() => toggleSourceApp(app)}>{app}</span>
+                            <span className="ms-auto text-xs text-muted-foreground tabular-nums">
+                              {photos.filter((p) => p.source === app).length}
+                            </span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                  </div>
                 </PopoverContent>
               </Popover>
               <Button
