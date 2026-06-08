@@ -19,6 +19,7 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   X,
   Filter,
   Search,
@@ -31,6 +32,19 @@ import {
   Star,
   Plus,
 } from "lucide-react"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+} from "@workspace/ui/components/sidebar"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -44,23 +58,9 @@ type Photo = {
   source: string
 }
 
-type Collection = {
-  id: string
-  label: string
-  icon: React.ComponentType<{ className?: string }>
-  count: number
-}
-
 type LayoutMode = "grid" | "columns" | "list"
 
 // ─── Sample data ──────────────────────────────────────────────────────────────
-
-const COLLECTIONS: Collection[] = [
-  { id: "all", label: "All Photos", icon: LayoutGrid, count: 12 },
-  { id: "favorites", label: "Favorites", icon: Star, count: 3 },
-  { id: "recent", label: "Recent", icon: Calendar, count: 4 },
-  { id: "albums", label: "Albums", icon: FolderOpen, count: 2 },
-]
 
 const PHOTOS: Photo[] = [
   {
@@ -296,69 +296,117 @@ export function GalleryPage({ className }: GalleryPageProps) {
     <TooltipProvider>
       <div className={cn("flex h-full overflow-hidden", className)}>
         {/* ── Sidebar ─────────────────────────────────────────────────── */}
-        <aside className="w-52 flex-shrink-0 border-e border-border flex flex-col bg-background">
-          <div className="p-4">
-            <h2 className="text-sm font-semibold text-foreground mb-3">Library</h2>
-            <nav className="space-y-1">
-              {COLLECTIONS.map((col) => {
-                const Icon = col.icon
-                return (
-                  <button
-                    key={col.id}
-                    onClick={() => setActiveCollection(col.id)}
-                    className={cn(
-                      "w-full flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors text-start",
-                      activeCollection === col.id
-                        ? "bg-accent text-accent-foreground font-medium"
-                        : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                    )}
-                  >
-                    <Icon className="size-4 shrink-0" />
-                    <span className="flex-1 truncate">{col.label}</span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      {col.id === "all"
-                        ? photos.length
-                        : col.id === "favorites"
-                        ? photos.filter((p) => p.favorite).length
-                        : col.count}
-                    </span>
-                  </button>
-                )
-              })}
-            </nav>
-          </div>
-
-          <div className="px-4 mt-2">
-            <h2 className="text-sm font-semibold text-foreground mb-3">Layout</h2>
-            <div className="flex gap-1">
-              {(["grid", "columns", "list"] as LayoutMode[]).map((mode) => (
-                <Tooltip key={mode}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={layoutMode === mode ? "secondary" : "ghost"}
-                      size="icon-xs"
-                      onClick={() => setLayoutMode(mode)}
+        <Sidebar side="left" variant="sidebar" collapsible="none" className="w-52">
+          <SidebarContent>
+            {/* Library group */}
+            <SidebarGroup>
+              <SidebarGroupLabel>Library</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      isActive={activeCollection === "all"}
+                      onClick={() => setActiveCollection("all")}
                     >
-                      {mode === "grid" && <LayoutGrid className="size-3" />}
-                      {mode === "columns" && <Columns className="size-3" />}
-                      {mode === "list" && <List className="size-3" />}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" className="capitalize">
-                    {mode}
-                  </TooltipContent>
-                </Tooltip>
-              ))}
-            </div>
-          </div>
+                      <LayoutGrid className="size-4" />
+                      <span>All Photos</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      isActive={activeCollection === "favorites"}
+                      onClick={() => setActiveCollection("favorites")}
+                    >
+                      <Star className="size-4" />
+                      <span>Favorites</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      isActive={activeCollection === "recent"}
+                      onClick={() => setActiveCollection("recent")}
+                    >
+                      <Calendar className="size-4" />
+                      <span>Recent</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      isActive={activeCollection === "albums"}
+                      onClick={() => setActiveCollection("albums")}
+                      className="[&>svg]:hidden"
+                    >
+                      <FolderOpen className="size-4" />
+                      <span>Albums</span>
+                      <ChevronDown className="size-4 ms-auto transition-transform data-[state=open]:rotate-180" />
+                    </SidebarMenuButton>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          isActive={activeCollection === "album-summer"}
+                          onClick={() => setActiveCollection("album-summer")}
+                        >
+                          <span>Summer 2025</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          isActive={activeCollection === "album-travel"}
+                          onClick={() => setActiveCollection("album-travel")}
+                        >
+                          <span>Travel</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          isActive={activeCollection === "album-nature"}
+                          onClick={() => setActiveCollection("album-nature")}
+                        >
+                          <span>Nature</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
+            {/* Layout group */}
+            <SidebarGroup>
+              <SidebarGroupLabel>Layout</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <div className="flex gap-1 px-2">
+                  {(["grid", "columns", "list"] as LayoutMode[]).map((mode) => (
+                    <Tooltip key={mode}>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant={layoutMode === mode ? "secondary" : "ghost"}
+                          size="icon-xs"
+                          onClick={() => setLayoutMode(mode)}
+                        >
+                          {mode === "grid" && <LayoutGrid className="size-3" />}
+                          {mode === "columns" && <Columns className="size-3" />}
+                          {mode === "list" && <List className="size-3" />}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="capitalize">
+                        {mode}
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                </div>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+
+          {/* Footer */}
           <div className="mt-auto border-t border-border p-4">
             <Button variant="outline" className="w-full justify-start gap-2 text-sm">
               <Plus className="size-4" />
               Add Photos
             </Button>
           </div>
-        </aside>
+        </Sidebar>
 
         {/* ── Main content ─────────────────────────────────────────────── */}
         <div className="flex-1 flex flex-col min-w-0">
