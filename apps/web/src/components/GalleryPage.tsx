@@ -2,6 +2,7 @@ import * as React from "react"
 import {
   Dialog,
   DialogContent,
+  DialogOverlay,
 } from "@workspace/ui/components/dialog"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -686,8 +687,9 @@ export function GalleryPage({ className }: GalleryPageProps) {
 
         {/* ── Lightbox ────────────────────────────────────────────────── */}
         <Dialog open={lightboxIdx !== null} onOpenChange={(open) => !open && closeLightbox()}>
+          <DialogOverlay className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md" />
           <DialogContent
-            className="p-0 m-0 max-w-none w-screen h-screen rounded-none border-0 bg-black/60 backdrop-blur-md"
+            className="fixed inset-0 z-50 p-0 m-0 rounded-none border-0 bg-transparent"
             showCloseButton={false}
           >
             {/* Prev / Next */}
