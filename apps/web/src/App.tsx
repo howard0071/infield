@@ -261,28 +261,29 @@ import {
 import { Calendar } from "@workspace/ui/components/calendar"
 import { NativeSelect,  NativeSelectOption } from "@workspace/ui/components/native-select"
 import { Toaster } from "@workspace/ui/components/sonner"
+import { GalleryPage } from "./components/GalleryPage"
 import { toast } from "sonner"
 import {
   Home,
-  Users,
-  FileText,
-  BarChart3,
-  Mail,
-  Bell,
-  Settings,
-  ChevronDown,
-  
-  Plus,
-  Copy,
-  Download,
-  Edit3,
-  Trash2,
-  ArrowLeft,
-  ArrowRight,
-  
-  Menu,
-  MoreHorizontal,
-} from "lucide-react"
+    Users,
+    FileText,
+    BarChart3,
+    Mail,
+    Bell,
+    Settings,
+    ChevronDown,
+    Image,
+    Plus,
+    Copy,
+    Download,
+    Edit3,
+    Trash2,
+    ArrowLeft,
+    ArrowRight,
+
+    Menu,
+    MoreHorizontal,
+  } from "lucide-react"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Section = { id: string; label: string; icon: React.ComponentType<{ className?: string }> }
@@ -290,6 +291,7 @@ type Section = { id: string; label: string; icon: React.ComponentType<{ classNam
 // ─── Sidebar sections ─────────────────────────────────────────────────────────
 const sections: Section[] = [
   { id: "navigation", label: "Navigation", icon: Home },
+  { id: "gallery", label: "Gallery", icon: Image },
   { id: "forms", label: "Forms", icon: FileText },
   { id: "data", label: "Data Display", icon: BarChart3 },
   { id: "feedback", label: "Feedback", icon: Bell },
@@ -1282,6 +1284,7 @@ export function App() {
               <div className="p-6">
                 <h2 className="text-2xl font-bold mb-6 capitalize">{activeSection}</h2>
                 {activeSection === "navigation" && <NavigationSection />}
+                {activeSection === "gallery" && <GalleryPage className="h-[calc(100vh-120px)] rounded-lg border overflow-hidden" />}
                 {activeSection === "forms" && <FormsSection />}
                 {activeSection === "data" && <DataSection />}
                 {activeSection === "feedback" && <FeedbackSection />}
