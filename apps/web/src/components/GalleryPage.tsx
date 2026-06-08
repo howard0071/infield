@@ -12,6 +12,8 @@ import {
   TooltipProvider,
 } from "@workspace/ui/components/tooltip"
 import { ScrollArea } from "@workspace/ui/components/scroll-area"
+import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover"
+import { Checkbox } from "@workspace/ui/components/checkbox"
 import { cn } from "@workspace/ui/lib/utils"
 import {
   Heart,
@@ -19,6 +21,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Filter,
   ImageIcon,
   LayoutGrid,
   Columns,
@@ -180,13 +183,37 @@ export function GalleryPage({ className }: GalleryPageProps) {
   const [layoutMode, setLayoutMode] = React.useState<LayoutMode>("grid")
   const [photos, setPhotos] = React.useState(PHOTOS)
   const [favoritesOnly, setFavoritesOnly] = React.useState(false)
+  const [selectedMonths, setSelectedMonths] = React.useState<string[]>([])
+
+  // Extract unique months from photos
+  const availableMonths = React.useMemo(() => {
+    const seen = new Set<string>()
+    photos.forEach((p) => {
+      const d = new Date(p.date)
+      seen.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`)
+    })
+    return Array.from(seen).sort()
+  }, [photos])
+
+  const toggleMonth = (month: string) => {
+    setSelectedMonths((prev) =>
+      prev.includes(month) ? prev.filter((m) => m !== month) : [...prev, month]
+    )
+  }
 
   const filteredPhotos = React.useMemo(() => {
     let list = photos
     if (activeCollection === "favorites") list = list.filter((p) => p.favorite)
     if (favoritesOnly) list = list.filter((p) => p.favorite)
+    if (selectedMonths.length > 0) {
+      list = list.filter((p) => {
+        const d = new Date(p.date)
+        const m = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
+        return selectedMonths.includes(m)
+      })
+    }
     return list
-  }, [photos, activeCollection, favoritesOnly])
+  }, [photos, activeCollection, favoritesOnly, selectedMonths])
 
   const colsClass = THUMB_SIZES[zoomIndex].cols
 
@@ -304,6 +331,45 @@ export function GalleryPage({ className }: GalleryPageProps) {
               <span className="text-sm font-medium text-foreground">
                 {filteredPhotos.length} photo{filteredPhotos.length !== 1 ? "s" : ""}
               </span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={selectedMonths.length > 0 ? "secondary" : "ghost"}
+                    size="icon-xs"
+                  >
+                    <Filter className="size-3" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-52 p-3" align="start">
+                  <p className="text-xs font-semibold text-foreground mb-2">Filter by month</p>
+                  <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                    {availableMonths.map((month) => {
+                      const [year, m] = month.split("-")
+                      const label = new Date(Number(year), Number(m) - 1, 1).toLocaleString("default", {
+                        month: "long",
+                        year: "numeric",
+                      })
+                      return (
+                        <label key={month} className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground">
+                          <Checkbox
+                            checked={selectedMonths.includes(month)}
+                            onCheckedChange={() => toggleMonth(month)}
+                          />
+                          {label}
+                        </label>
+                      )
+                    })}
+                  </div>
+                  {selectedMonths.length > 0 && (
+                    <button
+                      className="mt-2 text-xs text-muted-foreground hover:text-foreground underline"
+                      onClick={() => setSelectedMonths([])}
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                </PopoverContent>
+              </Popover>
               <Button
                 variant={favoritesOnly ? "secondary" : "ghost"}
                 size="icon-xs"
