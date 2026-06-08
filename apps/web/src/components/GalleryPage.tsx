@@ -45,6 +45,11 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from "@workspace/ui/components/sidebar"
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@workspace/ui/components/collapsible"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -191,6 +196,7 @@ interface GalleryPageProps {
 
 export function GalleryPage({ className }: GalleryPageProps) {
   const [activeCollection, setActiveCollection] = React.useState("all")
+  const [albumsOpen, setAlbumsOpen] = React.useState(true)
   const [lightboxIdx, setLightboxIdx] = React.useState<number | null>(null)
   const [zoomIndex, setZoomIndex] = React.useState(1) // 0=small, 1=medium, 2=large
   const [layoutMode, setLayoutMode] = React.useState<LayoutMode>("grid")
@@ -330,43 +336,48 @@ export function GalleryPage({ className }: GalleryPageProps) {
                       <span>Recent</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      isActive={activeCollection === "albums"}
-                      onClick={() => setActiveCollection("albums")}
-                      className="[&>svg]:hidden"
-                    >
-                      <FolderOpen className="size-4" />
-                      <span>Albums</span>
-                      <ChevronDown className="size-4 ms-auto transition-transform data-[state=open]:rotate-180" />
-                    </SidebarMenuButton>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          isActive={activeCollection === "album-summer"}
-                          onClick={() => setActiveCollection("album-summer")}
+                  <Collapsible open={albumsOpen} onOpenChange={setAlbumsOpen}>
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton
+                          isActive={activeCollection === "albums"}
+                          onClick={() => setActiveCollection("albums")}
                         >
-                          <span>Summer 2025</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          isActive={activeCollection === "album-travel"}
-                          onClick={() => setActiveCollection("album-travel")}
-                        >
-                          <span>Travel</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          isActive={activeCollection === "album-nature"}
-                          onClick={() => setActiveCollection("album-nature")}
-                        >
-                          <span>Nature</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  </SidebarMenuItem>
+                          <FolderOpen className="size-4" />
+                          <span>Albums</span>
+                          <ChevronDown className="size-4 ms-auto transition-transform data-[state=open]:rotate-180" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              isActive={activeCollection === "album-summer"}
+                              onClick={() => setActiveCollection("album-summer")}
+                            >
+                              <span>Summer 2025</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              isActive={activeCollection === "album-travel"}
+                              onClick={() => setActiveCollection("album-travel")}
+                            >
+                              <span>Travel</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              isActive={activeCollection === "album-nature"}
+                              onClick={() => setActiveCollection("album-nature")}
+                            >
+                              <span>Nature</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
