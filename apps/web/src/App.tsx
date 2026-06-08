@@ -1282,15 +1282,20 @@ export function App() {
 
             <ScrollArea className="h-[calc(100vh-65px)]">
               <div className="p-6">
-                <h2 className="text-2xl font-bold mb-6 capitalize">{activeSection}</h2>
-                {activeSection === "navigation" && <NavigationSection />}
-                {activeSection === "gallery" && <GalleryPage className="h-[calc(100vh-120px)] rounded-lg border overflow-hidden" />}
-                {activeSection === "forms" && <FormsSection />}
-                {activeSection === "data" && <DataSection />}
-                {activeSection === "feedback" && <FeedbackSection />}
-                {activeSection === "layout" && <LayoutSection />}
-                {activeSection === "overlays" && <OverlaysSection />}
-                {activeSection === "advanced" && <AdvancedSection />}
+                {activeSection === "gallery" ? (
+                  <GalleryPage className="h-[calc(100vh-120px)] rounded-lg border overflow-hidden" />
+                ) : (
+                  <>
+                    <h2 className="text-2xl font-bold mb-6 capitalize">{activeSection}</h2>
+                    {activeSection === "navigation" && <NavigationSection />}
+                    {activeSection === "forms" && <FormsSection />}
+                    {activeSection === "data" && <DataSection />}
+                    {activeSection === "feedback" && <FeedbackSection />}
+                    {activeSection === "layout" && <LayoutSection />}
+                    {activeSection === "overlays" && <OverlaysSection />}
+                    {activeSection === "advanced" && <AdvancedSection />}
+                  </>
+                )}
               </div>
             </ScrollArea>
           </SidebarInset>
