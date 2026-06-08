@@ -2,7 +2,6 @@ import * as React from "react"
 import {
   Dialog,
   DialogContent,
-  DialogClose,
 } from "@workspace/ui/components/dialog"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -688,104 +687,115 @@ export function GalleryPage({ className }: GalleryPageProps) {
         {/* ── Lightbox ────────────────────────────────────────────────── */}
         <Dialog open={lightboxIdx !== null} onOpenChange={(open) => !open && closeLightbox()}>
           <DialogContent
-            className="p-0 m-0 max-w-none w-screen h-screen rounded-none border-0 bg-black/95"
+            className="p-0 m-0 max-w-none w-screen h-screen rounded-none border-0 bg-black/60 backdrop-blur-md"
             showCloseButton={false}
           >
-            {/* Lightbox header */}
-            <div className="absolute top-0 inset-x-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/60 to-transparent">
-              <div className="text-sm text-white font-medium">
-                {currentPhoto?.title}
-              </div>
-              <div className="flex items-center gap-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      className="text-white hover:bg-white/20"
-                      onClick={() => currentPhoto && toggleFavorite(currentPhoto.id)}
-                    >
-                      <Heart
-                        className={cn(
-                          "size-4",
-                          currentPhoto?.favorite && "fill-white text-white"
-                        )}
-                      />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent className="text-white bg-black/80 border-white/20">
-                    {currentPhoto?.favorite ? "Unfavorite" : "Favorite"}
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      className="text-white hover:bg-white/20"
-                      onClick={() => currentPhoto && deletePhoto(currentPhoto.id)}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent className="text-white bg-black/80 border-white/20">
-                    Delete
-                  </TooltipContent>
-                </Tooltip>
-                <DialogClose asChild>
-                  <Button variant="ghost" size="icon-xs" className="text-white hover:bg-white/20 ms-1">
-                    <X className="size-4" />
-                  </Button>
-                </DialogClose>
-              </div>
-            </div>
-
             {/* Prev / Next */}
             {filteredPhotos.length > 1 && (
               <>
                 <Button
                   variant="ghost"
-                  size="icon-xs"
-                  className="absolute top-1/2 -translate-y-1/2 start-4 text-white hover:bg-white/20 z-10"
+                  size="icon"
+                  className="absolute top-1/2 -translate-y-1/2 start-4 text-white hover:bg-white/20 z-20"
                   onClick={(e) => {
                     e.stopPropagation()
                     prevPhoto()
                   }}
                 >
-                  <ChevronLeft className="size-6" />
+                  <ChevronLeft className="size-8" />
                 </Button>
                 <Button
                   variant="ghost"
-                  size="icon-xs"
-                  className="absolute top-1/2 -translate-y-1/2 end-4 text-white hover:bg-white/20 z-10"
+                  size="icon"
+                  className="absolute top-1/2 -translate-y-1/2 end-4 text-white hover:bg-white/20 z-20"
                   onClick={(e) => {
                     e.stopPropagation()
                     nextPhoto()
                   }}
                 >
-                  <ChevronRight className="size-6" />
+                  <ChevronRight className="size-8" />
                 </Button>
               </>
             )}
 
-            {/* Image */}
+            {/* Image + hover controls */}
             {currentPhoto && (
               <div
-                className="flex items-center justify-center w-full h-full p-16"
+                className="flex items-center justify-center w-full h-full"
                 onClick={closeLightbox}
               >
-                <img
-                  src={currentPhoto.src}
-                  alt={currentPhoto.title}
-                  className="max-w-full max-h-full object-contain rounded-md shadow-2xl"
-                />
+                <div
+                  className="group relative"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Image */}
+                  <img
+                    src={currentPhoto.src}
+                    alt={currentPhoto.title}
+                    className="max-w-[calc(100vw-8rem)] max-h-[calc(100vh-8rem)] object-contain rounded-lg shadow-2xl"
+                  />
+
+                  {/* Hover overlay: buttons top-right of image */}
+                  <div className="absolute top-3 end-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="bg-black/60 hover:bg-white/20 text-white backdrop-blur-sm"
+                          onClick={() => toggleFavorite(currentPhoto.id)}
+                        >
+                          <Heart
+                            className={cn(
+                              "size-5",
+                              currentPhoto.favorite && "fill-white text-white"
+                            )}
+                          />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="text-white bg-black/80 border-white/20">
+                        {currentPhoto.favorite ? "Unfavorite" : "Favorite"}
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="bg-black/60 hover:bg-white/20 text-white backdrop-blur-sm"
+                          onClick={() => deletePhoto(currentPhoto.id)}
+                        >
+                          <Trash2 className="size-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="text-white bg-black/80 border-white/20">
+                        Delete
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="bg-black/60 hover:bg-white/20 text-white backdrop-blur-sm"
+                          onClick={closeLightbox}
+                        >
+                          <X className="size-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="text-white bg-black/80 border-white/20">
+                        Close
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </div>
               </div>
             )}
 
             {/* Footer */}
             <div className="absolute bottom-0 inset-x-0 z-10 flex items-center justify-center gap-4 px-4 py-3 bg-gradient-to-t from-black/60 to-transparent">
               <span className="text-xs text-white/70">
-                {currentPhoto?.date}
+                {currentPhoto?.title}
                 {currentPhoto?.location && ` · ${currentPhoto.location}`}
               </span>
               {filteredPhotos.length > 1 && (
