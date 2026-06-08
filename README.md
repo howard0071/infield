@@ -63,6 +63,37 @@ Photo gallery showcase section. Files involved:
 
 GalleryPage is fully self-contained — no props passed from App.tsx except `className`.
 
+## Project Structure
+
+Standard monorepo pattern — used by Vercel, Shopify, Figma, and most mid-to-large frontend teams.
+
+```
+infield/
+├── apps/web/                    # Vite + React app
+│   └── src/
+│       ├── main.tsx            # Entry point
+│       ├── App.tsx             # Showcase shell + GalleryPage render
+│       └── components/
+│           ├── GalleryPage.tsx # Gallery section component
+│           └── theme-provider.tsx
+└── packages/ui/                 # Shared shadcn/ui component library
+    └── src/
+        ├── components/         # 56 component source files
+        └── styles/globals.css   # Design tokens (CSS variables)
+
+apps/web imports UI components from @workspace/ui (compiled from packages/ui)
+```
+
+**Why this structure:**
+- One place to maintain UI components — all apps share the same library
+- Version control is clean, changes are atomic
+- Easy to publish `packages/ui` as an internal npm package if needed
+
+**Variations:**
+- Single repo, no packages — fine for small projects, gets messy as it grows
+- Separate repos — `infield-web` + `infield-ui` as two repos, harder to coordinate
+- Micro-frontends — each feature is its own deployed app, overkill for most teams
+
 ## Tech stack
 
 - React 19 + TypeScript
